@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+  <title>To do list</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <header>
+    <nav>
+      <img class="headerImg" src="./images/bg-desktop-dark.jpg" alt="image de fond">
+      <div class="titleTodo">
+        <h1>TODO</h1>
+        <img class="light" src="./images/icon-sun.svg" alt="darkmode">
+      </div>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="containerInput">
+      <input class="input" placeholder="Create a new todo..." type="text">
+      <button>ADD</button>
+    </div>
+
+    <ul class="list">
+      <li id="emptyList">Tasks list is empty!</li>
+    </ul>
+    <div class="count">
+      <p>0 items</p>
+      <a id="all" href="#"> All</a>
+      <a id="active" href="#"> Active</a>
+      <a id="completed" href="#"> Completed</a>
+      <a id="clearCompleted" href="#"> Clear Completed</a>
+    </div>
+    <p class="textDrag">drag and drop to reorder list</p>
+  </div>
+
+</body>
+
+<script src="/script.js"></script>
+
+</html>
