@@ -10,7 +10,19 @@ const clearCompleted = document.getElementById("clearCompleted");
 const switchMode = document.querySelector(".light");
 
 let number = 0;
-function createTodo() {
+
+function saveTodos() {
+  const todos = [];
+  document.querySelectorAll(".todo").forEach((todo) => {
+    todos.push({
+      text: todo.querySelector(".text").textContent,
+      completed: todo.querySelector(".checkbox").checked,
+    });
+  });
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+function createTodo(text, completed = false) {
   if (emptyList) {
     emptyList.remove();
   }
@@ -18,6 +30,7 @@ function createTodo() {
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.classList.add("checkbox");
+  checkbox.checked = completed;
 
   const close = document.createElement("img");
   close.src = "./images/icon-cross.svg";
@@ -29,144 +42,51 @@ function createTodo() {
 
   const textTodo = document.createElement("p");
   textTodo.classList.add("text");
-  textTodo.textContent = input.value;
+  textTodo.textContent = text;
+  textTodo.style.textDecoration = completed ? "line-through" : "none";
 
   list.appendChild(todo);
   todo.appendChild(textTodo);
   todo.prepend(checkbox);
   todo.appendChild(close);
+
   number++;
   count.textContent = number + " items";
 
-  todo.addEventListener("dragstart", () => {
-    todo.classList.add("dragging");
-  });
-
-  todo.addEventListener("dragend", () => {
-    todo.classList.remove("dragging");
-  });
-
-  list.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    const afterElement = getDragAfterElement(event.clientY);
-    const draggingItem = document.querySelector(".dragging");
-    if (!afterElement) {
-      list.appendChild(draggingItem);
-    } else {
-      list.insertBefore(draggingItem, afterElement);
-    }
-  });
+  saveTodos();
 
   close.addEventListener("click", () => {
     todo.remove();
-
-    const checkbox = todo.querySelector(".checkbox");
-    const isChecked = checkbox.checked;
-    if (!isChecked) {
-      number--;
-    }
-    number = Math.max(number, 0);
+    number--;
     count.textContent = number + " items";
+    saveTodos();
   });
 
-  checkbox.addEventListener("click", () => {
-    if (!checkbox.checked) {
-      number++;
-      textTodo.style.textDecoration = "none";
-    } else {
-      number--;
-      textTodo.style.textDecoration = "line-through";
-    }
-
-    count.textContent = number + " items";
+  checkbox.addEventListener("change", () => {
+    textTodo.style.textDecoration = checkbox.checked ? "line-through" : "none";
+    saveTodos();
   });
-  all.addEventListener("click", () => {
-    document.querySelectorAll(".todo").forEach((todo) => {
-      todo.style.display = "flex";
-    });
-  });
-  active.addEventListener("click", () => {
-    if (!checkbox.checked) {
-      todo.style.display = "flex";
-    } else {
-      todo.style.display = "none";
-    }
-  });
-  completed.addEventListener("click", () => {
-    if (!checkbox.checked) {
-      todo.style.display = "none";
-    } else {
-      todo.style.display = "flex";
-    }
-  });
-  clearCompleted.addEventListener("click", () => {
-    if (checkbox.checked) {
-      todo.remove();
-    }
-  });
-  input.value = "";
 }
 
-function getDragAfterElement(y) {
-  const draggableElements = document.querySelectorAll(".todo:not(.dragging)");
-  let closestElement = null;
-  let closestOffset = Number.NEGATIVE_INFINITY;
-
-  for (let i = 0; i < draggableElements.length; i++) {
-    const child = draggableElements[i];
-    const box = child.getBoundingClientRect();
-    const offset = y - (box.top + box.height / 2);
-
-    if (offset < 0 && offset > closestOffset) {
-      closestOffset = offset;
-      closestElement = child;
-    }
-  }
-
-  return closestElement;
+function loadTodos() {
+  const todos = JSON.parse(localStorage.getItem("todos")) || [];
+  todos.forEach((todo) => {
+    createTodo(todo.text, todo.completed);
+  });
 }
+
+document.addEventListener("DOMContentLoaded", loadTodos);
 
 input.addEventListener("keypress", (e) => {
   if (e.keyCode === 13 && input.value.trim() !== "") {
-    createTodo();
+    createTodo(input.value);
+    input.value = "";
   }
 });
 
 add.addEventListener("click", () => {
   if (input.value.trim() !== "") {
-    createTodo();
-  }
-});
-
-function changeMode() {
-  let toggleTheme = true;
-
-  switchMode.addEventListener("click", () => {
-    if (toggleTheme) {
-      switchMode.src = "./images/icon-moon.svg";
-      toggleTheme++;
-    } else {
-      toggleTheme--;
-    }
-  });
-}
-
-let toggleTheme = true;
-
-switchMode.addEventListener("click", () => {
-  console.log("re");
-  if (toggleTheme === true) {
-    switchMode.src = "./images/icon-moon.svg";
-    document.querySelector("body").style.setProperty("background-color", "hsl(236, 33%, 92%)");
-    document.querySelector("body").style.setProperty("background-color", "hsl(236, 33%, 92%)");
-    document.querySelector(".headerImg").src = "./images/bg-desktop-light.jpg";
-    document.querySelector(".list li").style.color = "gray";
-
-    toggleTheme = false;
-  } else {
-    toggleTheme = true;
-    switchMode.src = "./images/icon-sun.svg";
-    document.querySelector("body").style.setProperty("background-color", "");
-    document.querySelector(".headerImg").src = "./images/bg-desktop-dark.jpg";
+    createTodo(input.value);
+    input.value = "";
   }
 });
